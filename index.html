@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>向阳·向蔚来 - 西电宁波校友新年家宴抽奖</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- 烟花背景效果 -->
+    <div class="fireworks-container" id="fireworksContainer"></div>
+
+    <!-- 飘落元素 -->
+    <div class="falling-elements" id="fallingElements"></div>
+
+    <!-- 背景音乐 -->
+    <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+
+    <div class="main-container">
+        <!-- 标题区 -->
+        <header class="header">
+            <h1 class="title">
+                <span class="title-highlight">向阳·向蔚来</span>
+            </h1>
+            <h2 class="subtitle">1.31 西电宁波校友新年家宴</h2>
+        </header>
+
+        <!-- 当前奖项展示 -->
+        <section class="prize-section">
+            <div class="current-prize">
+                <div class="prize-label">当前抽取</div>
+                <div class="prize-name" id="currentPrize">三等奖</div>
+                <div class="prize-desc" id="prizeDesc">米家榨汁杯/跳绳 - 价值99元</div>
+                <div class="prize-count">
+                    剩余 <span id="remainingCount">22</span> 份
+                </div>
+            </div>
+        </section>
+
+        <!-- 抽奖滚动区 -->
+        <section class="lottery-section">
+            <div class="name-display-wrapper">
+                <div class="name-display" id="nameDisplay">
+                    点击开始抽奖
+                </div>
+            </div>
+            <button class="lottery-btn" id="lotteryBtn">
+                <span class="btn-text">开始抽奖</span>
+                <div class="btn-glow"></div>
+            </button>
+        </section>
+
+        <!-- 中奖名单 -->
+        <section class="winners-section">
+            <div class="winners-panel">
+                <h3 class="winners-title">🎉 本轮中奖名单</h3>
+                <div class="winners-list" id="currentWinners"></div>
+            </div>
+        </section>
+
+        <!-- 奖项切换 -->
+        <section class="prize-nav">
+            <button class="nav-btn" id="prevPrize" disabled>◀ 上一奖项</button>
+            <span class="round-indicator" id="roundIndicator">第 1 / 7 轮</span>
+            <button class="nav-btn" id="nextPrize">下一奖项 ▶</button>
+        </section>
+    </div>
+
+    <!-- 奖品列表侧边栏 -->
+    <aside class="prize-sidebar" id="prizeSidebar">
+        <h3 class="sidebar-title">🎁 奖品列表</h3>
+        <ul class="prize-list" id="prizeList"></ul>
+    </aside>
+
+    <!-- 所有获奖者面板 -->
+    <aside class="all-winners-sidebar" id="allWinnersSidebar">
+        <h3 class="sidebar-title">🏆 全部获奖者</h3>
+        <div class="all-winners-content" id="allWinnersContent"></div>
+    </aside>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

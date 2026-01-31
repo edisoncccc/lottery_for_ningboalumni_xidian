@@ -1,0 +1,25 @@
+# OS & System
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ID & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary Files
+*.tmp
+*.log
+*.bak
+~$*
+
+# Large/Compressed Files
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Proprietary/Copyrighted Media
+*.ncm
