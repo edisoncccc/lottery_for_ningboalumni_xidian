@@ -1,4 +1,4 @@
-# 任务清单
+# 任务清单 - lottery_for_ningboalumni_xidian
 
 ## 阶段一：文档与需求 (已完成)
 - [x] 更新 `PRD/requirements.md` (明确功能与UI需求)
