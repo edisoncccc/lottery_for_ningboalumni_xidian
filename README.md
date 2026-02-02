@@ -1,8 +1,13 @@
-# 西电宁波校友新年家宴抽奖系统 (XD-Ningbo Lottery)
+# lottery_for_ningboalumni_xidian (西电宁波校友新年家宴抽奖系统)
 
 这是一个为西电宁波校友会新年家宴定制的现场抽奖系统。采用纯前端技术栈（HTML/CSS/JS）开发，旨在提供流畅、炫酷的视觉体验，烘托活动现场氛围。
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
+## 📸 界面预览
+
+![Lottery Screenshot](screenshot.png)
+
 
 ## ✨ 特性
 
@@ -15,7 +20,7 @@
 
 1.  **下载/克隆项目**
     ```bash
-    git clone https://github.com/your-username/lottery.git
+    git clone https://github.com/edisoncccc/lottery_for_ningboalumni_xidian.git
     ```
 2.  **准备数据**
     *   修改 `script.js` 中的 `attendants` 数组，填入参与抽奖的人员名单。
