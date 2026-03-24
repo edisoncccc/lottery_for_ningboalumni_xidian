@@ -7,8 +7,15 @@
 // ========================================
 
 
-// 创建全局音效实例
-
+// 安全随机数生成（消除模偏差）
+function secureRandom(max) {
+    const array = new Uint32Array(1);
+    const limit = Math.floor(0xFFFFFFFF / max) * max;
+    do {
+        crypto.getRandomValues(array);
+    } while (array[0] >= limit);
+    return array[0] % max;
+}
 
 // 参与者名单
 const attendants = [
@@ -93,20 +100,73 @@ const fireworksContainer = document.getElementById('fireworksContainer');
 const fallingElements = document.getElementById('fallingElements');
 const bgm = document.getElementById('bgm');
 
+// 状态持久化
+function saveState() {
+    localStorage.setItem('lotteryState', JSON.stringify({
+        allWinners,
+        currentPrizeIndex,
+        remainingAttendants
+    }));
+}
+
+function loadState() {
+    const saved = localStorage.getItem('lotteryState');
+    if (!saved) return false;
+    try {
+        const state = JSON.parse(saved);
+        if (!Array.isArray(state.remainingAttendants) || typeof state.allWinners !== 'object') {
+            throw new Error('invalid');
+        }
+        allWinners = state.allWinners;
+        currentPrizeIndex = Math.min(state.currentPrizeIndex, prizeConfig.length - 1);
+        remainingAttendants = state.remainingAttendants;
+        return true;
+    } catch (e) {
+        localStorage.removeItem('lotteryState');
+        return false;
+    }
+}
+
+function resetState() {
+    if (!confirm('确定要重置所有抽奖结果吗？')) return;
+    localStorage.removeItem('lotteryState');
+    currentPrizeIndex = 0;
+    remainingAttendants = [...attendants];
+    allWinners = {};
+    prizeConfig.forEach(prize => { allWinners[prize.name] = []; });
+    currentRoundWinners = [];
+    updatePrizeDisplay();
+    renderAllWinners();
+    renderPrizeList();
+    updatePrizeListHighlight();
+}
+
 // 初始化
 function init() {
+    // 初始化每个奖项的获奖者数组（先初始化再加载，确保结构完整）
+    prizeConfig.forEach(prize => {
+        allWinners[prize.name] = [];
+    });
+
+    // 尝试恢复上次状态
+    loadState();
+
     updatePrizeDisplay();
     renderPrizeList();
+    renderAllWinners();
     initFallingElements();
     playBgm();
 
     lotteryBtn.addEventListener('click', handleLotteryClick);
     prevPrizeBtn.addEventListener('click', () => changePrize(-1));
     nextPrizeBtn.addEventListener('click', () => changePrize(1));
+    document.getElementById('resetBtn').addEventListener('click', resetState);
 
-    // 初始化每个奖项的获奖者数组
-    prizeConfig.forEach(prize => {
-        allWinners[prize.name] = [];
+    // 键盘快捷键
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') { e.preventDefault(); handleLotteryClick(); }
+        if (e.code === 'ArrowLeft') changePrize(-1);
+        if (e.code === 'ArrowRight') changePrize(1);
     });
 }
 
@@ -138,18 +198,15 @@ function updatePrizeDisplay() {
     if (remaining <= 0) {
         nameDisplay.textContent = "本奖项已抽完";
         lotteryBtn.disabled = true;
-        lotteryBtn.style.opacity = "0.5";
     } else {
         nameDisplay.textContent = "点击开始抽奖";
         lotteryBtn.disabled = false;
-        lotteryBtn.style.opacity = "1";
     }
 
     // 检查是否还有人可抽
     if (remainingAttendants.length === 0) {
         nameDisplay.textContent = "所有人已中奖";
         lotteryBtn.disabled = true;
-        lotteryBtn.style.opacity = "0.5";
     }
 }
 
@@ -244,7 +301,7 @@ function startRolling() {
     // 快速滚动名字
     let rollSpeed = 50;
     rollInterval = setInterval(() => {
-        const randomIndex = Math.floor(Math.random() * remainingAttendants.length);
+        const randomIndex = secureRandom(remainingAttendants.length);
         nameDisplay.textContent = remainingAttendants[randomIndex];
     }, rollSpeed);
 }
@@ -258,8 +315,8 @@ function stopRolling() {
     lotteryBtn.querySelector('.btn-text').textContent = '开始抽奖';
     nameDisplay.classList.remove('rolling');
 
-    // 随机选择最终中奖者
-    const winnerIndex = Math.floor(Math.random() * remainingAttendants.length);
+    // 随机选择最终中奖者（使用密码学安全随机数）
+    const winnerIndex = secureRandom(remainingAttendants.length);
     const winner = remainingAttendants[winnerIndex];
 
     // 从待抽名单中移除
@@ -284,25 +341,33 @@ function stopRolling() {
 
     // 触发烟花效果
     triggerFireworks();
+
+    // 持久化状态
+    saveState();
 }
 
-// 烟花效果
+// 烟花效果（使用 DocumentFragment 批量插入减少回流）
 function triggerFireworks() {
     const colors = ['#ffd700', '#ff6b35', '#e63946', '#ff1493', '#00ff88'];
+    const batchSize = 10;
+    const totalBatches = 5;
 
-    for (let i = 0; i < 50; i++) {
+    for (let batch = 0; batch < totalBatches; batch++) {
         setTimeout(() => {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.left = Math.random() * 100 + 'vw';
-            firework.style.top = Math.random() * 60 + 20 + 'vh';
-            firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            firework.style.boxShadow = `0 0 10px ${firework.style.backgroundColor}`;
-
-            fireworksContainer.appendChild(firework);
-
-            setTimeout(() => firework.remove(), 1500);
-        }, i * 30);
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < batchSize; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                const color = colors[secureRandom(colors.length)];
+                firework.style.left = Math.random() * 100 + 'vw';
+                firework.style.top = Math.random() * 60 + 20 + 'vh';
+                firework.style.backgroundColor = color;
+                firework.style.boxShadow = `0 0 10px ${color}`;
+                firework.addEventListener('animationend', () => firework.remove());
+                fragment.appendChild(firework);
+            }
+            fireworksContainer.appendChild(fragment);
+        }, batch * 150);
     }
 }
 
@@ -321,20 +386,16 @@ function initFallingElements() {
     }
 }
 
-// 播放背景音乐
+// 播放背景音乐（持续尝试直到成功）
 function playBgm() {
-    bgm.volume = 0.5; // 设置初始音量
-    const playPromise = bgm.play();
-
-    if (playPromise !== undefined) {
-        playPromise.catch(error => {
-            console.log("自动播放被阻止，等待用户交互");
-            // 添加一次性点击事件来触发播放
-            document.body.addEventListener('click', () => {
-                bgm.play();
-            }, { once: true });
-        });
-    }
+    bgm.volume = 0.5;
+    const tryPlay = () => {
+        bgm.play().then(() => {
+            document.removeEventListener('click', tryPlay);
+        }).catch(() => {});
+    };
+    tryPlay();
+    document.addEventListener('click', tryPlay);
 }
 
 // 启动

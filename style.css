@@ -142,7 +142,6 @@ body {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shine 3s linear infinite;
-    text-shadow: var(--glow-gold);
     filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
 }
 
@@ -312,16 +311,15 @@ body {
     transform: translateY(0);
 }
 
+.lottery-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 .lottery-btn.running {
     background: linear-gradient(135deg, var(--warm-orange), var(--primary-red));
-}
-
-.lottery-btn.running .btn-text::after {
-    content: '停止抽奖';
-}
-
-.lottery-btn.running .btn-text {
-    font-size: 0;
 }
 
 .btn-glow {
@@ -432,6 +430,18 @@ body {
 .round-indicator {
     font-size: clamp(0.9rem, 1.8vw, 1.2rem);
     color: var(--text-light);
+}
+
+.reset-btn {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+    margin-left: 1vw;
+}
+
+.reset-btn:hover {
+    background: var(--primary-red);
+    border-color: var(--primary-red);
+    color: var(--text-white);
 }
 
 /* ========================================
